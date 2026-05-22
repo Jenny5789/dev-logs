@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LINGO BRIDGE_TRANSLATER</title>
+  <!-- 구글 폰트 -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: linear-gradient(135deg, #f0f4ff 0%, #fde8ff 50%, #fff3e0 100%);
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2rem;
+      color: #5c3fdb;
+      margin-bottom: 1.5rem;
+    }
+
+    /* 언어 버튼 */
+    .lang-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .lang-btn {
+      padding: 8px 20px;
+      border: none;
+      border-radius: 999px;
+      background: white;
+      color: #555;
+      font-size: 14px;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .lang-btn:hover { transform: translateY(-2px); }
+
+    /* 선택된 언어 버튼 */
+    .lang-btn.active {
+      background: linear-gradient(135deg, #7c3aed, #ec4899);
+      color: white;
+      box-shadow: 0 4px 12px rgba(124,58,237,0.3);
+    }
+
+    /* 입력창 / 결과창 감싸는 박스 */
+    .box-wrap {
+      display: flex;
+      gap: 1rem;
+      max-width: 800px;
+      margin: 0 auto 1rem;
+    }
+
+    /* 각 패널 (입력 / 결과) */
+    .panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* 패널 라벨 (한국어 / 번역 언어명) */
+    .panel-label {
+      font-size: 12px;
+      color: #999;
+      margin-bottom: 6px;
+      padding-left: 4px;
+    }
+
+    /* 입력창 감싸는 래퍼 (X 버튼 위치 잡기용) */
+    .input-wrap {
+      position: relative;
+      flex: 1;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 180px;
+      padding: 1rem;
+      padding-right: 36px;
+      padding-bottom: 2rem;
+      border-radius: 16px;
+      border: none;
+      font-size: 15px;
+      font-family: inherit;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+      resize: none;
+      background: white;
+    }
+
+    /* X 초기화 버튼 */
+    #clearBtn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: none;
+      background: #ccc;
+      color: white;
+      font-size: 12px;
+      cursor: pointer;
+      display: none; /* 기본은 숨김 */
+      align-items: center;
+      justify-content: center;
+    }
+
+    #clearBtn:hover { background: #aaa; }
+
+    /* 글자수 표시 */
+    .char-count {
+      font-size: 12px;
+      color: #999;
+      text-align: right;
+      position: absolute;
+      bottom: 10px;
+      right: 14px;
+    }
+
+    /* 번역 결과창 */
+    #result {
+      min-height: 180px;
+      padding: 1rem;
+      border-radius: 16px;
+      border: none;
+      font-size: 15px;
+      font-family: inherit;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+      background: linear-gradient(135deg, #fdf4ff, #eff6ff);
+      color: #333;
+    }
+
+    /* 번역 결과 비어있을 때 */
+    .result-empty { color: #bbb; }
+
+    /* 번역하기 버튼 */
+    #translateBtn {
+      display: block;
+      margin: 0 auto;
+      padding: 12px 40px;
+      background: linear-gradient(135deg, #7c3aed, #ec4899);
+      color: white;
+      border: none;
+      border-radius: 999px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      box-shadow: 0 4px 16px rgba(124,58,237,0.3);
+      transition: all 0.2s;
+    }
+
+    #translateBtn:hover { transform: translateY(-2px); }
+
+    /* 모바일 화면에서는 세로로 배치 */
+    @media (max-width: 600px) {
+      .box-wrap { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>LINGO BRIDGE</h1>
+
+  <!-- 언어 선택 버튼들 -->
+  <div class="lang-wrap">
+    <button class="lang-btn active" data-lang="en">영어</button>
+    <button class="lang-btn" data-lang="ja">일본어</button>
+    <button class="lang-btn" data-lang="zh-CN">중국어</button>
+    <button class="lang-btn" data-lang="es">스페인어</button>
+    <button class="lang-btn" data-lang="fr">프랑스어</button>
+  </div>
+
+  <!-- 입력창 / 결과창 -->
+  <div class="box-wrap">
+
+    <!-- 왼쪽: 한국어 입력 -->
+    <div class="panel">
+      <div class="input-wrap">
+        <textarea id="inputText" placeholder="번역할 한국어를 입력하세요"></textarea>
+        <!-- X 초기화 버튼 -->
+        <button id="clearBtn" title="초기화">✕</button>
+         <!-- 글자수 표시 -->
+      <div class="char-count"><span id="charCount">0</span> / 1000자</div>
+      </div>
+    </div>
+
+    <!-- 오른쪽: 번역 결과 -->
+    <div class="panel">
+      <div id="result"><span class="result-empty">번역 결과가 여기에 나타납니다</span></div>
+    </div>
+
+  </div>
+
+  <!-- 번역 버튼 -->
+  <button id="translateBtn">번역하기</button>
+
+  <script>
+    // 선택된 언어 (기본값: 영어)
+    let targetLang = 'en';
+
+    // 언어 버튼 클릭 시
+    const buttons = document.querySelectorAll('.lang-btn');
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        // active 클래스 이동
+        buttons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        targetLang = btn.dataset.lang;
+
+        
+        // 언어 바꾸면 자동으로 재번역
+        const text = document.getElementById('inputText').value;
+        if (text) {
+          document.getElementById('translateBtn').click();
+        }
+      });
+    });
+
+    // 글자수 카운트 + X 버튼 표시/숨김
+    document.getElementById('inputText').addEventListener('input', () => {
+      const text = document.getElementById('inputText').value;
+
+      // 1000자 초과 시 자르기
+    if (text.length > 1000) {
+    document.getElementById('inputText').value = text.slice(0, 1000);
+    }
+      document.getElementById('charCount').innerText = document.getElementById('inputText').value.length;
+      document.getElementById('clearBtn').style.display = text.length > 0 ? 'flex' : 'none';
+    });
+
+    // X 버튼 클릭 시 초기화
+    document.getElementById('clearBtn').addEventListener('click', () => {
+      document.getElementById('inputText').value = '';
+      document.getElementById('charCount').innerText = '0';
+      document.getElementById('clearBtn').style.display = 'none';
+      document.getElementById('result').innerHTML = '<span class="result-empty">번역 결과가 여기에 나타납니다</span>';
+    });
+
+    // 번역 버튼 클릭 시
+    document.getElementById('translateBtn').addEventListener('click', async () => {
+      const text = document.getElementById('inputText').value;
+      if (!text) return;
+
+      document.getElementById('result').innerText = '번역 중...';
+
+      const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=ko|${targetLang}`;
+      const res = await fetch(url);
+      const data = await res.json();
+
+      document.getElementById('result').innerText = data.responseData.translatedText;
+    });
+  </script>
+
+</body>
+</html>
