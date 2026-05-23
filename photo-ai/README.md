@@ -28,6 +28,7 @@ AI 전시회에서 얼굴 합성 기술을 체험한 후, 직접 구현해보고
 - 모바일 반응형 UI
 
 ## 📁 프로젝트 구조
+```
 photo-ai/
 ├── app.py              # Flask 서버 & API 연동
 ├── templates/
@@ -35,7 +36,7 @@ photo-ai/
 ├── uploads/            # 업로드된 사진 저장
 ├── requirements.txt    # 패키지 목록
 └── .env                # API 키 (비공개)
-
+```
 ## 🚀 로컬 실행 방법
 ```bash
 # 가상환경 활성화
