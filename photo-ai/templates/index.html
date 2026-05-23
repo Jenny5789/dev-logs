@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Photo Studio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Noto+Serif+KR:wght@300;400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --cream: #F2E8D9;
+            --tan: #DEC9A8;
+            --brown: #7A5C3A;
+            --dark: #2E1F0E;
+            --mid: #9C7A52;
+            --light: #FAF4EC;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Noto Serif KR', serif;
+            background-color: var(--cream);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23noise)' opacity='0.06'/%3E%3C/svg%3E");
+            color: var(--dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 52px 20px;
+        }
+
+        .film-strip-top, .film-strip-bottom {
+            position: fixed;
+            left: 0; right: 0;
+            height: 28px;
+            background: var(--dark);
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            z-index: 10;
+        }
+        .film-strip-top { top: 0; }
+        .film-strip-bottom { bottom: 0; }
+        .film-hole {
+            width: 18px; height: 14px;
+            background: var(--cream);
+            border-radius: 3px;
+            flex-shrink: 0;
+            margin: 0 10px;
+            opacity: 0.85;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 680px;
+            background: rgba(250, 244, 236, 0.6);
+            border: 1px solid rgba(222, 201, 168, 0.5);
+            border-radius: 8px;
+            padding: 32px 32px 24px;
+            box-shadow: 0 4px 24px rgba(46, 31, 14, 0.06);
+            backdrop-filter: blur(4px);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+        .header::before {
+            content: '— ✦ —';
+            display: block;
+            font-size: 12px;
+            color: var(--mid);
+            letter-spacing: 0.3em;
+            margin-bottom: 10px;
+        }
+        .title {
+            font-family: 'Playfair Display', serif;
+            font-size: 48px;
+            font-weight: 700;
+            color: var(--dark);
+            letter-spacing: 0.04em;
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+        .title span { font-style: italic; font-weight: 400; color: var(--brown); }
+        .subtitle {
+            font-size: 11px;
+            color: var(--mid);
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+        }
+
+        .card {
+            background: var(--light);
+            border: 1px solid var(--tan);
+            border-radius: 4px;
+            padding: 22px;
+            box-shadow: 2px 3px 12px rgba(46,31,14,0.08);
+        }
+
+        .card-label {
+            font-size: 10px;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: var(--mid);
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .card-label::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--tan);
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .upload-card {
+            background: var(--light);
+            border: 1px solid var(--tan);
+            border-radius: 4px;
+            padding: 22px;
+            box-shadow: 2px 3px 12px rgba(46,31,14,0.08);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .upload-area {
+            border: 1.5px dashed var(--tan);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: var(--cream);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            min-height: 180px;
+            flex: 1;
+            overflow: hidden;
+        }
+        .upload-area:hover { border-color: var(--brown); background: #EDE0CC; }
+        .upload-area input[type="file"] {
+            position: absolute; inset: 0;
+            opacity: 0; cursor: pointer;
+            width: 100%; height: 100%;
+        }
+        .upload-icon { font-size: 32px; margin-bottom: 12px; }
+        .upload-hint { font-size: 9px; color: var(--mid); line-height: 1.6; }
+        .file-name {
+            font-size: 10px; color: var(--dark);
+            margin-top: 10px; word-break: break-all;
+        }
+
+        #previewImg {
+            max-width: 70%;
+            max-height: 70%;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .theme-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 7px;
+        }
+        .theme-btn {
+            padding: 9px 4px;
+            border: 1px solid var(--tan);
+            border-radius: 4px;
+            background: var(--cream);
+            cursor: pointer;
+            font-size: 10px;
+            font-family: 'Noto Serif KR', serif;
+            color: var(--brown);
+            transition: all 0.2s ease;
+            text-align: center;
+            line-height: 1.3;
+            word-break: keep-all;
+        }
+        .theme-btn:hover { border-color: var(--brown); background: #EDE0CC; }
+        .theme-btn.active {
+            border-color: var(--dark);
+            background: var(--dark);
+            color: var(--cream);
+        }
+        .theme-btn .emoji { display: block; font-size: 16px; margin-bottom: 4px; }
+
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--dark);
+            color: var(--cream);
+            border: none;
+            border-radius: 4px;
+            font-size: 13px;
+            font-family: 'Noto Serif KR', serif;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+        .submit-btn:hover { background: var(--brown); }
+        .submit-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 16px 0 0;
+        }
+        .loading-track {
+            width: 100%;
+            height: 2px;
+            background: var(--tan);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        .loading-fill {
+            height: 100%;
+            background: var(--brown);
+            animation: load 2s ease-in-out infinite;
+        }
+        @keyframes load {
+            0% { width: 0%; margin-left: 0; }
+            50% { width: 60%; margin-left: 20%; }
+            100% { width: 0%; margin-left: 100%; }
+        }
+        .loading-text { font-size: 11px; color: var(--mid); font-style: italic; }
+
+        .footer {
+            text-align: center;
+            margin-top: 16px;
+            font-size: 10px;
+            color: var(--mid);
+            letter-spacing: 0.1em;
+        }
+
+        @media (max-width: 520px) {
+            .title { font-size: 34px; }
+            .main-grid { grid-template-columns: 1fr; }
+            .upload-area { min-height: 140px; }
+            .theme-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <div class="film-strip-top" id="topStrip"></div>
+
+    <div class="container">
+        <div class="header">
+            <h1 class="title">AI Photo <span>Studio</span></h1>
+            <p class="subtitle">Transform your portrait with AI</p>
+        </div>
+
+        <form action="/upload" method="POST" enctype="multipart/form-data" id="uploadForm">
+            <div class="main-grid">
+
+                <!-- 좌측: 사진 업로드 -->
+                <div class="upload-card">
+                    <div class="card-label">01 — 사진 선택</div>
+                    <div class="upload-area" id="uploadArea">
+                        <input type="file" name="photo" accept="image/*" id="fileInput">
+                        <img id="previewImg" src="" alt="" style="display:none;">
+                        <div id="uploadPlaceholder">
+                            <div class="upload-icon">🎞️</div>
+                            <div class="card-label">- 사진 업로드</div>
+                            <p class="upload-hint">얼굴이 잘 보이는<br>정면 사진 권장</p>
+                        </div>
+                        <p class="file-name" id="fileName"></p>
+                    </div>
+                </div>
+
+                <!-- 우측: 테마 선택 -->
+                <div class="card">
+                    <div class="card-label">02 — 테마 선택</div>
+                    <div class="theme-grid">
+                        <button type="button" class="theme-btn active" data-theme="gatsby"><span class="emoji">🥂</span>개츠비 파티</button>
+                        <button type="button" class="theme-btn" data-theme="royal"><span class="emoji">👑</span>로열 포트레이트</button>
+                        <button type="button" class="theme-btn" data-theme="cyberpunk"><span class="emoji">🌆</span>사이버펑크</button>
+                        <button type="button" class="theme-btn" data-theme="korean"><span class="emoji">🇰🇷</span>한복</button>
+                        <button type="button" class="theme-btn" data-theme="fantasy"><span class="emoji">🧙</span>판타지</button>
+                        <button type="button" class="theme-btn" data-theme="hollywood"><span class="emoji">🎬</span>할리우드</button>
+                        <button type="button" class="theme-btn" data-theme="joseon"><span class="emoji">🏯</span>조선시대</button>
+                        <button type="button" class="theme-btn" data-theme="chef"><span class="emoji">👨‍🍳</span>미슐랭 셰프</button>
+                        <button type="button" class="theme-btn" data-theme="idol"><span class="emoji">🎤</span>K-POP 아이돌</button>
+                        <button type="button" class="theme-btn" data-theme="drama"><span class="emoji">📸</span>드라마 주인공</button>
+                        <button type="button" class="theme-btn" data-theme="fighter"><span class="emoji">🥊</span>격투기 선수</button>
+                        <button type="button" class="theme-btn" data-theme="detective"><span class="emoji">🕵️</span>누아르 탐정</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 변환 버튼 -->
+            <button type="submit" class="submit-btn" id="submitBtn">✦ 변환하기</button>
+            <input type="hidden" name="theme" id="themeInput" value="gatsby">
+        </form>
+
+        <div class="loading" id="loading">
+            <div class="loading-track"><div class="loading-fill"></div></div>
+            <p class="loading-text">필름을 현상하는 중입니다... 약 30초 소요</p>
+        </div>
+
+        <div class="footer">Powered by AI · © 2026 AI Photo Studio</div>
+    </div>
+
+    <div class="film-strip-bottom" id="bottomStrip"></div>
+
+    <script>
+        function fillStrip(id) {
+            const strip = document.getElementById(id);
+            const count = Math.ceil(window.innerWidth / 25) + 5;
+            for (let i = 0; i < count; i++) {
+                const hole = document.createElement('div');
+                hole.className = 'film-hole';
+                strip.appendChild(hole);
+            }
+        }
+        fillStrip('topStrip');
+        fillStrip('bottomStrip');
+
+        document.getElementById('fileInput').addEventListener('change', function() {
+            const file = this.files[0];
+            if (!file) return;
+            document.getElementById('fileName').textContent = '✓ ' + file.name;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = document.getElementById('previewImg');
+                const placeholder = document.getElementById('uploadPlaceholder');
+                img.src = e.target.result;
+                img.style.display = 'block';
+                placeholder.style.display = 'none';
+                document.getElementById('fileName').style.color = '#2E1F0E';
+            };
+            reader.readAsDataURL(file);
+        });
+
+        document.querySelectorAll('.theme-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                document.getElementById('themeInput').value = this.dataset.theme;
+            });
+        });
+
+        document.getElementById('uploadForm').addEventListener('submit', function() {
+            const file = document.getElementById('fileInput').files[0];
+            if (!file) { alert('사진을 선택해주세요!'); return false; }
+            document.getElementById('submitBtn').disabled = true;
+            document.getElementById('submitBtn').textContent = '현상 중...';
+            document.getElementById('loading').style.display = 'block';
+        });
+    </script>
+</body>
+</html>
