@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="card">
+  <div class="card-title">⚙️ 통계 설정</div>
+  <div class="filter-form">
+    <select id="gradeSelect">
+      <option value="">전체</option>
+      <option value="1">1학년</option>
+      <option value="2">2학년</option>
+      <option value="3">3학년</option>
+    </select>
+    <select id="chartType">
+      <option value="subject">과목별 평균</option>
+      <option value="class">반별 비교</option>
+      <option value="hist">성적 분포</option>
+    </select>
+    <button class="btn btn-primary" onclick="loadStats()">🔄 갱신</button>
+  </div>
+</div>
+
+<div class="stats-grid">
+  <div class="card">
+    <div class="card-title" id="chartTitle">📊 과목별 평균</div>
+    <canvas id="mainChart" height="300"></canvas>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🏆 성적 순위 (상위 50명)</div>
+    <div class="table-wrap">
+      <table id="rankTable">
+        <thead>
+          <tr><th>순위</th><th>이름</th><th>학년/반/번</th><th>국어</th><th>영어</th><th>수학</th><th>평균</th></tr>
+        </thead>
+        <tbody id="rankBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+let chart = null;
+
+async function loadStats() {
+  const grade     = document.getElementById("gradeSelect").value;
+  const chartType = document.getElementById("chartType").value;
+  const url       = `/api/stats${grade ? "?grade="+grade : ""}`;
+  const data      = await fetch(url).then(r => r.json());
+
+  drawChart(chartType, data, grade);
+  drawRanking(data.ranking);
+}
+
+function drawChart(type, data, grade) {
+  const ctx = document.getElementById("mainChart").getContext("2d");
+  if (chart) chart.destroy();
+  const gradeLabel = grade ? grade+"학년 " : "전체 ";
+
+  if (type === "subject") {
+    document.getElementById("chartTitle").textContent = "📊 " + gradeLabel + "과목별 평균";
+    chart = new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels: ["국어","영어","수학"],
+        datasets: [{ data: data.subject_avg,
+          backgroundColor: ["#3b82f6","#10b981","#f59e0b"],
+          borderRadius: 8, borderSkipped: false }]
+      },
+      options: {
+        plugins: { legend: { display: false } },
+        scales: { y: { min: 0, max: 100, grid: { color: "#f0f0f0" } } },
+        animation: { duration: 600 }
+      }
+    });
+
+  } else if (type === "class") {
+    document.getElementById("chartTitle").textContent = "📊 반별 과목 평균 비교";
+    chart = new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels: data.class_data.labels,
+        datasets: [
+          { label:"국어",  data: data.class_data.korean,  backgroundColor:"#3b82f6", borderRadius:6 },
+          { label:"영어",  data: data.class_data.english, backgroundColor:"#10b981", borderRadius:6 },
+          { label:"수학",  data: data.class_data.math,    backgroundColor:"#f59e0b", borderRadius:6 }
+        ]
+      },
+      options: {
+        scales: { y: { min: 0, max: 100, grid: { color: "#f0f0f0" } } },
+        animation: { duration: 600 }
+      }
+    });
+
+  } else {
+    document.getElementById("chartTitle").textContent = "📊 " + gradeLabel + "평균 점수 분포";
+    chart = new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels: ["0~9","10~19","20~29","30~39","40~49","50~59","60~69","70~79","80~89","90~100"],
+        datasets: [{ label:"학생 수", data: data.histogram,
+          backgroundColor: "#8b5cf6", borderRadius: 6 }]
+      },
+      options: {
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, grid: { color: "#f0f0f0" } } },
+        animation: { duration: 600 }
+      }
+    });
+  }
+}
+
+function drawRanking(ranking) {
+  const medals = ["🥇","🥈","🥉"];
+  document.getElementById("rankBody").innerHTML = ranking.map(r => `
+    <tr>
+      <td>${medals[r.rank-1] || r.rank}</td>
+      <td><strong>${r.name}</strong></td>
+      <td>${r.class}</td>
+      <td>${r.korean}</td>
+      <td>${r.english}</td>
+      <td>${r.math}</td>
+      <td><span class="avg-badge avg-${r.average>=80?'high':r.average>=60?'mid':'low'}">${r.average}</span></td>
+    </tr>`).join("");
+}
+
+loadStats();
+</script>
+{% endblock %}
