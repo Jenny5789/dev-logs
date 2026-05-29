@@ -1,0 +1,443 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
+
+:root {
+    --bg-color: #fdfbf7;         /* 전체 배경: 미색 (Warm Ivory) */
+    --card-bg: #ffffff;
+    --border-color: #e7e3dc;
+    --text-color: #332f2c;
+    --accent-color: #ff5f1f;     /* 메인 포인트: 형광 주황색 */
+    --accent-hover: #e64a00;
+    
+    /* 할 일 상태별 내부 카드 배경색 */
+    --status-todo: rgba(255, 255, 255, 0.8);
+    --status-doing: #fff9db;     
+    --status-done: #e8f5e9;      
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Noto Sans KR', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    margin: 0;
+    padding: 20px 20px 60px 20px;
+    line-height: 1.5;
+}
+
+.container {
+    max-width: 850px;
+    margin: 0 auto;
+}
+
+h1 {
+    text-align: center;
+    color: var(--text-color);
+    margin-bottom: 30px;
+    font-size: 28px;
+    position: relative;
+    padding-bottom: 10px;
+    font-weight: 700;
+}
+
+h1::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 4px;
+    background-color: var(--accent-color);
+    border-radius: 2px;
+}
+
+.creator-box {
+    background: var(--card-bg);
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    margin-bottom: 20px;
+}
+
+.creator-box h3 {
+    margin: 0 0 15px 0;
+    font-size: 14px;
+    color: #5c554f;
+    font-weight: 500;
+}
+
+.input-row {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 15px;
+}
+
+.input-row input[type="text"] {
+    flex: 2;
+    min-width: 250px;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 15px;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: inherit;
+    transition: all 0.2s;
+}
+
+.input-row input[type="text"]:disabled {
+    background-color: #f1ede6;
+    color: #a19a93;
+    cursor: not-allowed;
+    border-color: #dcd7ce;
+}
+
+.input-row input:focus, .group-todo-adder-top input:focus, .color-select:focus, .main-select:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
+.group-todo-adder-top {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.01);
+    padding: 12px;
+    border-radius: 6px;
+    border: 1px solid rgba(0, 0, 0, 0.03);
+}
+
+.group-todo-adder-top input[type="date"], .group-todo-adder input[type="date"], .edit-todo-date {
+    flex: 1;
+    min-width: 150px;
+    padding: 10px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: #fff;
+    color: var(--text-color);
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: -0.5px; 
+}
+
+.group-todo-adder-top input[type="text"] {
+    flex: 3;
+    padding: 11px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: #fff;
+    font-family: inherit;
+}
+
+.main-select, .color-select {
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    font-size: 14px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+}
+
+.main-select { min-width: 210px; }
+.color-select { min-width: 130px; }
+
+.color-select:disabled {
+    background-color: #f1ede6;
+    color: #a19a93;
+    cursor: not-allowed;
+    border-color: #dcd7ce;
+    opacity: 0.6;
+}
+
+.btn-accent {
+    padding: 11px 24px;
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 14px;
+    font-family: inherit;
+    transition: background-color 0.2s;
+    white-space: nowrap;
+}
+.btn-accent:hover { background-color: var(--accent-hover); }
+
+.section-divider {
+    border: 0;
+    height: 1px;
+    background-color: var(--border-color);
+    margin: 25px 0;
+}
+
+.filter-tabs-header {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 30px;
+    justify-content: center;
+}
+
+.tab-btn {
+    padding: 10px 24px;
+    background-color: #f1ede4;     
+    color: #605751;               
+    border: 1px solid #e1dad0;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    font-family: inherit;
+    transition: all 0.2s;
+}
+
+.tab-btn:hover {
+    background-color: #e6dfd3;
+    color: var(--text-color);
+}
+
+.tab-btn.active {
+    background-color: var(--accent-color);
+    color: white;
+    border-color: var(--accent-color);
+    box-shadow: 0 4px 10px rgba(255, 95, 31, 0.3);
+}
+
+.empty-notice {
+    text-align: center;
+    padding: 40px;
+    background-color: var(--card-bg);
+    border: 1px dashed var(--border-color);
+    border-radius: 8px;
+    color: #8a847e;
+    font-size: 15px;
+}
+
+/* --- 생성된 그룹 카드 및 테마 디자인 --- */
+.todo-group {
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 25px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+}
+
+.theme-default { background-color: #ffffff; --theme-color: var(--accent-color); }
+.theme-yellow { background-color: #fffdf0; --theme-color: #d4a373; border-color: #f1ebd9; }
+.theme-green { background-color: #f7fdf9; --theme-color: #2a9d8f; border-color: #e3f2e8; }
+.theme-blue { background-color: #f5f9fd; --theme-color: #4a90e2; border-color: #e2ecf7; }
+.theme-purple { background-color: #faf7fd; --theme-color: #9b5de5; border-color: #f1e7fa; }
+.theme-none { background-color: #f8f6f0; --theme-color: #64748b; border-color: #e2e0d9; }
+
+.group-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+    padding-bottom: 12px;
+    margin-bottom: 15px;
+}
+
+.group-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 0;
+    color: var(--text-color);
+    border-left: 4px solid var(--theme-color);
+    padding: 2px 0 2px 10px;
+    cursor: pointer;
+    border-radius: 0 4px 4px 0;
+    transition: background-color 0.2s;
+}
+.group-title:hover { background-color: rgba(0, 0, 0, 0.03); }
+
+.edit-group-input {
+    font-size: 18px;
+    font-weight: bold;
+    padding: 2px 6px;
+    border: 1px solid var(--accent-color);
+    border-radius: 4px;
+    color: var(--text-color);
+    background-color: white;
+    font-family: inherit;
+}
+
+.group-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.delete-group-btn {
+    background-color: transparent;
+    color: #94a3b8;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 4px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-family: inherit;
+}
+.delete-group-btn:hover { background-color: #ef4444; color: white; border-color: #ef4444; }
+
+.group-todo-adder {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    margin-bottom: 5px;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.02);
+    padding: 10px;
+    border-radius: 6px;
+}
+
+.group-todo-adder input[type="text"] {
+    flex: 2.5;
+    padding: 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: inherit;
+}
+
+.group-todo-adder button {
+    padding: 8px 16px;
+    background-color: var(--text-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 13px;
+    font-family: inherit;
+}
+.group-todo-adder button:hover { background-color: #000000; }
+
+/* 할 일 아이템 목록 양식 */
+.todo-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.todo-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.todo-item.hidden { display: none !important; }
+
+.todo-item.status-todo { background-color: var(--status-todo); }
+.todo-item.status-doing { background-color: var(--status-doing); border-color: #ffe0cc; }
+.todo-item.status-done { 
+    background-color: var(--status-done);
+    color: #8c968d;
+    border-color: #d4edd6;
+}
+
+.todo-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-right: 15px;
+}
+
+.todo-text {
+    font-size: 15px;
+    word-break: break-all;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 2px 4px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+.todo-text:hover { background-color: rgba(0, 0, 0, 0.05); }
+.todo-item.status-done .todo-text { text-decoration: line-through; }
+
+.edit-todo-input {
+    width: 100%;
+    padding: 6px;
+    font-size: 15px;
+    border: 1px solid var(--accent-color);
+    border-radius: 4px;
+    background-color: white;
+    color: var(--text-color);
+    font-family: inherit;
+}
+
+.todo-date-info {
+    display: flex;
+    gap: 12px;
+    font-size: 11px;
+    color: #8a847e;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* ★ 수정 가능해진 마감일 텍스트 스타일 */
+.todo-duedate-clickable {
+    cursor: pointer;
+    padding: 1px 4px;
+    border-radius: 3px;
+    transition: background-color 0.2s;
+}
+.todo-duedate-clickable:hover {
+    background-color: rgba(0, 0, 0, 0.06);
+    color: var(--accent-color);
+}
+
+/* 마감일 수정을 위한 임시 인라인 인풋창 */
+.edit-todo-date {
+    padding: 2px 6px !important;
+    min-width: 130px !important;
+    font-size: 11px !important;
+    border: 1px solid var(--accent-color) !important;
+    height: auto !important;
+}
+
+.dday-badge { color: var(--accent-color); font-weight: bold; margin-left: 2px; }
+
+.todo-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.status-select {
+    padding: 6px;
+    border-radius: 4px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    background-color: white;
+    cursor: pointer;
+    font-size: 13px;
+    font-family: inherit;
+}
+
+.delete-todo-btn {
+    background: none;
+    border: none;
+    color: #94a3b8;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 20px;
+    line-height: 1;
+}
+.delete-todo-btn:hover { color: #ef4444; }
