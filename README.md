@@ -11,9 +11,11 @@
 
 ```text
 dev-logs/
-├── air-analysis/          📂 대기오염 분석 프로젝트 폴더
-│   ├── air_analysis.ipynb 📄 주피터 노트북 파일
-│   └── last_amb_hour_time.xls 📊 원본 엑셀 데이터 파일
+├── air-analysis/              📂 대기오염 분석 프로젝트 폴더
+│   ├── air_analysis.ipynb     📄 주피터 노트북 파일
+│   ├── last_amb_hour_time.xls 📊 원본 엑셀 데이터 파일
+│   ├── images/                🖼️ 분석 그래프 이미지
+│   └── README.md              📝 분석 상세 설명 문서
 │
 ├── translator/            📂 링고 브릿지 번역기 프로젝트 폴더
 │   ├── index.html         🌐 웹 서비스 화면 파일
@@ -33,8 +35,8 @@ dev-logs/
 ## 📍 프로젝트 목록 및 지도
 
 ### 🌤️ 서울 한강대로 대기오염 물질 분석 ➡️ [`/air-analysis`](./air-analysis)
-- **설명**: 서울역 앞(한강대로 측정소)의 일주일간 대기오염 데이터를 활용하여 Pandas 및 데이터 시각화를 연습해 본 프로젝트입니다.
-- **🔗 분석 결과 블로그**: [nbviewer로 분석 그래프 확인하기](https://nbviewer.org/github/Jenny5789/dev-logs/blob/main/air-analysis/air_analysis.ipynb)
+- **설명**: 서울역 앞(한강대로 측정소)의 일주일간(2026.05) 대기오염 데이터를 활용하여 Pandas 및 데이터 시각화를 연습해 본 프로젝트입니다.
+- **🔗 노트북 바로보기**: [nbviewer로 분석 그래프 확인하기](https://nbviewer.org/github/Jenny5789/dev-logs/blob/main/air-analysis/air_analysis.ipynb)
 
 <br>
 
