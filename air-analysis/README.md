@@ -3,8 +3,8 @@
 [![nbviewer](https://img.shields.io/badge/nbviewer-open-blue)](https://nbviewer.org/github/Jenny5789/dev-logs/blob/main/air-analysis/air_analysis.ipynb)
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Jenny5789/dev-logs/blob/main/air-analysis/air_analysis.ipynb)
 
-서울 한강대로 측정소의 대기환경기준물질 6가지를 탐색적 데이터 분석(EDA)한 프로젝트입니다.  
-**기간:** 2026.05.17 ~ 05.23 | **데이터 출처:** 에어코리아 | **도구:** Python (pandas, matplotlib, seaborn)
+**서울 한강대로 측정소의 대기환경기준물질 6가지를 탐색적 데이터 분석(EDA)한 프로젝트입니다.**<br>
+**기간:** 2026.05.17 ~ 05.23 <br> **데이터 출처:** 에어코리아 <br> **도구:** Python (pandas, matplotlib, seaborn)
 
 ---
 
@@ -54,7 +54,7 @@
 - O3 ↔ NO2 (r=-0.15) 뚜렷한 연관성 없음
 
 ### 4. 시간대별 PM2.5 패턴 분석
-6일치 데이터를 시간대(0~23시)별로 평균 내어 하루 중 PM2.5 농도 변화 경향을 파악했습니다.
+일주일치 데이터를 시간대(0~23시)별로 평균 내어 하루 중 PM2.5 농도 변화 경향을 파악했습니다.
 
 ![막대그래프](images/04_hourly.png)
 
@@ -90,7 +90,7 @@
 
 ## ⚠️ 한계점
 
-- 6일치 단기 데이터로 통계적 유의성 낮음
+- 일주일치 단기 데이터로 통계적 유의성 낮음
 - 기상 데이터 및 교통량 데이터 부재로 원인 직접 검증 불가
 
 ---
