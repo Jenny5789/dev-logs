@@ -17,19 +17,12 @@ dev-logs/
 │   ├── images/                🖼️ 분석 그래프 이미지
 │   └── README.md              📝 분석 상세 설명 문서
 │
-├── translator/            📂 링고 브릿지 번역기 프로젝트 폴더
-│   ├── index.html         🌐 웹 서비스 화면 파일
-│   ├── translator.py      🐍 파이썬 CLI 로직 파일
-│   ├── screenshot.png     📸 실행 화면 스크린샷
-│   └── README.md          📝 번역기 상세 설명 문서
-│
-└── photo-ai/              📂 AI 포토 스튜디오 프로젝트 폴더
-    ├── app.py             🐍 Flask 서버 & API 연동
-    ├── templates/
-    │   └── index.html     🌐 프론트엔드 UI
-    ├── uploads/           📸 업로드된 사진 저장
-    ├── requirements.txt   📦 패키지 목록
-    └── .env               🔒 API 키 (비공개)
+└── translator/            📂 링고 브릿지 번역기 프로젝트 폴더
+    ├── index.html         🌐 웹 서비스 화면 파일
+    ├── translator.py      🐍 파이썬 CLI 로직 파일
+    ├── screenshot.png     📸 실행 화면 스크린샷
+    └── README.md          📝 번역기 상세 설명 문서
+ 
 ```
 
 ## 📍 프로젝트 목록 및 지도
@@ -45,7 +38,3 @@ dev-logs/
 - **🔗 배포 링크**: [LINGO BRIDGE 직접 사용해보기](https://dev-logs-sdqg.vercel.app/)
 
 <br>
-
-### 🎞️ AI Photo Studio ➡️ [`/photo-ai`](./photo-ai)
-- **설명**: 사진을 업로드하면 AI가 선택한 테마에 맞게 얼굴을 합성해 새로운 이미지를 생성하는 웹 서비스입니다.
-- **🔗 배포 링크**: [photo-ai-mkzy.onrender.com](https://photo-ai-mkzy.onrender.com)
